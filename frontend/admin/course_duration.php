@@ -43,5 +43,6 @@
     </div>
   </div>
  <script src="../js/course_duration.js"></script>
+ <script src="../js/common.js"></script>
 </body>
 </html> 

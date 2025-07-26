@@ -93,6 +93,7 @@
     <?php include '../components/footer.php'; ?>
   </div>
   <script src="../js/course.js"></script>
+  <script src="../js/common.js"></script>
  
 </body>
 </html> 

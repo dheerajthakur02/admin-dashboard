@@ -58,6 +58,7 @@
     <?php include '../components/footer.php'; ?>
   </div>
   <script src="../js/stream.js"></script>
+  <script src="../js/common.js"></script>
  
 </body>
 </html> 

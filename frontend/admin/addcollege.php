@@ -196,3 +196,4 @@
 <script src="../js/addcollege.js"></script>
 </body>
 </html>
+

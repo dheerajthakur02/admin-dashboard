@@ -86,75 +86,6 @@ async function countForDashboard() {
 // === Stream & Degree Count ===
 async function streamCountForDashboard() {
   try {
-    const [streamData, degreeData] = await Promise.all([
-      apiRequest("http://localhost:4000/api/stream/all").catch((err) => {
-        if (err.message === "Not Found") return { data: [] };
-        throw err;
-      }),
-      apiRequest("http://localhost:4000/api/degree/all").catch((err) => {
-        if (err.message === "Not Found") return { degrees: [] };
-        throw err;
-      }),
-    ]);
-
-    document.getElementById("streamCountForDashboard").textContent =
-      streamData.data?.length ?? "-";
-    document.getElementById("degreeCountForDashboard").textContent =
-      degreeData.degrees?.length ?? "-";
-  } catch (err) {
-    // Only log if not a 404 error
-    if (err.message !== "Not Found") {
-      console.error("Stream/Degree fetch failed:", err);
-    }
-    document.getElementById("streamCountForDashboard").textContent = "-";
-    document.getElementById("degreeCountForDashboard").textContent = "-";
-  }
-}
-
-// === Fullscreen Handling ===
-const fullscreenToggle = document.getElementById("fullscreenToggle");
-
-fullscreenToggle?.addEventListener("click", () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-});
-
-document.addEventListener("fullscreenchange", () => {
-  document.body.classList.toggle(
-    "fullscreen-active",
-    !!document.fullscreenElement
-  );
-  if (!document.fullscreenElement) return;
-  closeSidebar();
-});
-
-// === Init on DOMContentLoaded ===
-document.addEventListener("DOMContentLoaded", () => {
-  // Auto-expand Location Directory submenu on specific page
-  if (window.location.pathname.includes("country.php")) {
-    keepSubmenuOpen("locationDirectoryDropdown", "locationChevron");
-  }
-
-  countForDashboard();
-  streamCountForDashboard();
-});
-
-// === Prevent Sidebar Close on Submenu Click ===
-document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
-  link.addEventListener("click", (e) => {
-    if (window.innerWidth <= 900) {
-      e.stopPropagation(); // Allow navigation but don't close sidebar
-    }
-  });
-});
-
-// Stream count for dashboard
-
-async function streamCountForDashboard() {
-  try {
     const res = await fetch("http://localhost:4000/api/stream/all");
     const res2 = await fetch("http://localhost:4000/api/degree/all");
     const res3 = await fetch(
@@ -214,3 +145,48 @@ async function streamCountForDashboard() {
   }
 }
 streamCountForDashboard();
+
+// === Fullscreen Handling ===
+const fullscreenToggle = document.getElementById("fullscreenToggle");
+
+fullscreenToggle?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  document.body.classList.toggle(
+    "fullscreen-active",
+    !!document.fullscreenElement
+  );
+  if (!document.fullscreenElement) return;
+  closeSidebar();
+});
+
+// === Init on DOMContentLoaded ===
+document.addEventListener("DOMContentLoaded", () => {
+  // Auto-expand Location Directory submenu on specific page
+  if (window.location.pathname.includes("country.php")) {
+    keepSubmenuOpen("locationDirectoryDropdown", "locationChevron");
+  }
+
+  countForDashboard();
+  streamCountForDashboard();
+});
+
+// === Prevent Sidebar Close on Submenu Click ===
+document.querySelectorAll(".sidebar nav .submenu li a").forEach((link) => {
+  link.addEventListener("click", function () {
+    document.querySelectorAll(".sidebar nav .submenu li a").forEach((l) => {
+      l.classList.remove("active");
+    });
+    this.classList.add("active");
+    if (window.innerWidth < 900) {
+      document.querySelector(".sidebar").classList.remove("open");
+      document.querySelector(".overlay").classList.remove("show");
+    }
+  });
+});

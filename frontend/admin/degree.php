@@ -44,5 +44,6 @@
   </div>
   <script src="../js/stream.js"></script>
   <script src="../js/degree.js"></script>
+  <script src="../js/common.js"></script>
 </body>
 </html> 
