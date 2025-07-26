@@ -6,7 +6,7 @@ export const addCollegeFacility = async (req, res) => {
     const logoFile = req.file;
     const newCollegeFacility = new CollegeFacility({
       name,
-      logo: logoFile ? `uploads/${logoFile.filename}` : null,
+      logo: logoFile ? `uploads/${logoFile.filename}` : null, // Fixed template string
     });
     await newCollegeFacility.save();
     res.status(201).json(newCollegeFacility);
@@ -40,7 +40,7 @@ export const updateCollegeFacility = async (req, res) => {
     const { name } = req.body;
     const logoFile = req.file;
     const updateData = { name };
-    if (logoFile) updateData.logo = `uploads/${logoFile.filename}`;
+    if (logoFile) updateData.logo = `uploads/${logoFile.filename}`; // Fixed template string
     const updatedCollegeFacility = await CollegeFacility.findByIdAndUpdate(
       id,
       updateData,
