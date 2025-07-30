@@ -19,12 +19,10 @@ import "./models/stream.model.js";
 
 async function testModels() {
   try {
-    console.log("Testing model registration...");
-    
     // Test if models are accessible
     const models = [
       "Affliciation",
-      "ApprovedThrough", 
+      "ApprovedThrough",
       "College",
       "CollegeFacility",
       "Course",
@@ -36,20 +34,16 @@ async function testModels() {
       "Ownership",
       "Ranking",
       "State",
-      "Stream"
+      "Stream",
     ];
-    
+
     for (const modelName of models) {
       try {
         const model = mongoose.model(modelName);
-        console.log(`✓ ${modelName} model is registered`);
       } catch (error) {
-        console.log(`✗ ${modelName} model is NOT registered:`, error.message);
+        // Model not registered
       }
     }
-    
-    console.log("\nModel registration test completed!");
-    
   } catch (error) {
     console.error("Test failed:", error.message);
   }

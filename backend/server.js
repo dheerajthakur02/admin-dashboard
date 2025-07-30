@@ -89,5 +89,6 @@ app.use("/api/exam", examRoutes);
 app.use("/api/college", collegeRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  // Server is running
+  console.log(`Server is running on port ${PORT}`);
 });

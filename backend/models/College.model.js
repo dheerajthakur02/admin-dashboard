@@ -28,15 +28,19 @@ const CollegeSchema = new mongoose.Schema(
     collegeVideo: [{ type: String }],
     sectionTitle: { type: String },
     affiliation: { type: mongoose.Schema.Types.ObjectId, ref: "Affliciation" },
-    facilities: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CollegeFacility",
-    },
-    collegeCourses: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
-    approvedThrough: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ApprovedThrough",
-    },
+    facilities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CollegeFacility",
+      },
+    ],
+    collegeCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    approvedThrough: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ApprovedThrough",
+      },
+    ],
   },
   { timestamps: true }
 );

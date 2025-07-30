@@ -27,9 +27,7 @@ export const addState = async (req, res) => {
 
 export const getAllStates = async (req, res) => {
   try {
-    console.log("Fetching all states...");
     const states = await State.find();
-    console.log(`Found ${states.length} states`);
     res.status(200).json(states);
   } catch (error) {
     console.error("Fetch error:", error.message);

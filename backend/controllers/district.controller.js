@@ -29,12 +29,10 @@ export const getAllDistricts = async (req, res) => {
 export const getDistrictsByState = async (req, res) => {
   try {
     const { stateId } = req.params;
-    console.log("Fetching districts for state:", stateId);
     const districts = await District.find({ state: stateId }).populate(
       "state",
       "name"
     );
-    console.log("Found districts:", districts.length);
     res.status(200).json(districts);
   } catch (error) {
     console.error("Fetch error:", error.message);

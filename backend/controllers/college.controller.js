@@ -3,12 +3,6 @@ import mongoose from "mongoose";
 
 export const addCollege = async (req, res) => {
   try {
-    console.log("Received request body:", req.body);
-    console.log("Received files:", req.files);
-    console.log("Raw facilities data:", req.body.facilities);
-    console.log("Raw collegeCourses data:", req.body.collegeCourses);
-    console.log("Raw approvedThrough data:", req.body.approvedThrough);
-
     const {
       name,
       popularName,
@@ -35,32 +29,21 @@ export const addCollege = async (req, res) => {
       });
     }
 
-    console.log("Extracted fields:", {
-      name,
-      popularName,
-      shortName,
-      establishedYear,
-      campusSize,
-      typeMode,
-      affiliation,
-      facilities,
-      collegeCourses,
-      approvedThrough,
-    });
-
-    const logoFile = req.files?.collegeLogo?.[0];
-    const bannerFile = req.files?.collegeBanner?.[0];
-    const brochureFile = req.files?.collegeBrochure?.[0];
-    const galleryFiles = req.files?.collegeGallery || [];
-    const videoFiles = req.files?.collegeVideo || [];
-
-    console.log("File processing:", {
-      logoFile: logoFile?.filename,
-      bannerFile: bannerFile?.filename,
-      brochureFile: brochureFile?.filename,
-      galleryFilesCount: galleryFiles.length,
-      videoFilesCount: videoFiles.length,
-    });
+    // Handle files from upload.any()
+    const allFiles = req.files || [];
+    const logoFile = allFiles.find((file) => file.fieldname === "collegeLogo");
+    const bannerFile = allFiles.find(
+      (file) => file.fieldname === "collegeBanner"
+    );
+    const brochureFile = allFiles.find(
+      (file) => file.fieldname === "collegeBrochure"
+    );
+    const galleryFiles = allFiles.filter(
+      (file) => file.fieldname === "collegeGallery"
+    );
+    const videoFiles = allFiles.filter(
+      (file) => file.fieldname === "collegeVideo"
+    );
 
     // Process address object
     const addressObj = {};
@@ -93,8 +76,6 @@ export const addCollege = async (req, res) => {
       addressObj.pincode = Array.isArray(pincode) ? pincode[0] : pincode;
     }
 
-    console.log("Processed address:", addressObj);
-
     // Create college object without empty fields
     const collegeData = {
       name,
@@ -120,21 +101,35 @@ export const addCollege = async (req, res) => {
     if (state) collegeData.state = state;
     if (district) collegeData.district = district;
     if (affiliation) collegeData.affiliation = affiliation;
-    if (facilities) collegeData.facilities = facilities;
-    if (collegeCourses) collegeData.collegeCourses = collegeCourses;
-    if (approvedThrough) collegeData.approvedThrough = approvedThrough;
+
+    // Handle multiple selections for facilities, collegeCourses, and approvedThrough
+    if (facilities && Array.isArray(facilities)) {
+      collegeData.facilities = facilities.filter((f) => f && f !== "");
+    } else if (facilities) {
+      collegeData.facilities = [facilities].filter((f) => f && f !== "");
+    }
+
+    if (collegeCourses && Array.isArray(collegeCourses)) {
+      collegeData.collegeCourses = collegeCourses.filter((c) => c && c !== "");
+    } else if (collegeCourses) {
+      collegeData.collegeCourses = [collegeCourses].filter(
+        (c) => c && c !== ""
+      );
+    }
+
+    if (approvedThrough && Array.isArray(approvedThrough)) {
+      collegeData.approvedThrough = approvedThrough.filter(
+        (a) => a && a !== ""
+      );
+    } else if (approvedThrough) {
+      collegeData.approvedThrough = [approvedThrough].filter(
+        (a) => a && a !== ""
+      );
+    }
 
     const college = new College(collegeData);
 
-    console.log("College object created:", college);
-
     const savedCollege = await college.save();
-    console.log("College saved successfully with ID:", savedCollege._id);
-    console.log("College saved to collection:", savedCollege.collection.name);
-    console.log(
-      "Full saved college data:",
-      JSON.stringify(savedCollege, null, 2)
-    );
     res.status(201).json({
       message: "College added successfully!",
       college: savedCollege,
@@ -151,9 +146,7 @@ export const addCollege = async (req, res) => {
 
 export const getAllColleges = async (req, res) => {
   try {
-    console.log("Fetching all colleges...");
     const College = mongoose.model("College");
-    console.log("College model collection name:", College.collection.name);
 
     const colleges = await College.find()
       .populate("affiliation")
@@ -163,9 +156,6 @@ export const getAllColleges = async (req, res) => {
       .populate("state")
       .populate("district")
       .sort({ createdAt: -1 });
-
-    console.log(`Found ${colleges.length} colleges`);
-    console.log("Colleges data:", JSON.stringify(colleges, null, 2));
     res.status(200).json(colleges);
   } catch (error) {
     console.error("Error fetching colleges:", error);
@@ -223,36 +213,73 @@ export const editCollege = async (req, res) => {
       }
     }
 
-    // Handle file uploads
-    if (req.files?.collegeLogo?.[0]) {
-      updateData.collegeLogo = `uploads/${req.files.collegeLogo[0].filename}`;
+    // Handle file uploads from upload.any()
+    const allFiles = req.files || [];
+    const logoFile = allFiles.find((file) => file.fieldname === "collegeLogo");
+    const bannerFile = allFiles.find(
+      (file) => file.fieldname === "collegeBanner"
+    );
+    const brochureFile = allFiles.find(
+      (file) => file.fieldname === "collegeBrochure"
+    );
+    const galleryFiles = allFiles.filter(
+      (file) => file.fieldname === "collegeGallery"
+    );
+    const videoFiles = allFiles.filter(
+      (file) => file.fieldname === "collegeVideo"
+    );
+
+    if (logoFile) {
+      updateData.collegeLogo = `uploads/${logoFile.filename}`;
     }
-    if (req.files?.collegeBanner?.[0]) {
-      updateData.collegeBanner = `uploads/${req.files.collegeBanner[0].filename}`;
+    if (bannerFile) {
+      updateData.collegeBanner = `uploads/${bannerFile.filename}`;
     }
-    if (req.files?.collegeBrochure?.[0]) {
-      updateData.collegeBrochure = `uploads/${req.files.collegeBrochure[0].filename}`;
+    if (brochureFile) {
+      updateData.collegeBrochure = `uploads/${brochureFile.filename}`;
     }
-    if (req.files?.collegeGallery) {
-      updateData.collegeGallery = req.files.collegeGallery.map(
+    if (galleryFiles.length > 0) {
+      updateData.collegeGallery = galleryFiles.map(
         (file) => `uploads/${file.filename}`
       );
     }
-    if (req.files?.collegeVideo) {
-      updateData.collegeVideo = req.files.collegeVideo.map(
+    if (videoFiles.length > 0) {
+      updateData.collegeVideo = videoFiles.map(
         (file) => `uploads/${file.filename}`
       );
     }
 
+    // Handle state and district fields
+    if (req.body.state) updateData.state = req.body.state;
+    if (req.body.district) updateData.district = req.body.district;
+
     // Handle multiple selections for facilities, collegeCourses, and approvedThrough
-    if (req.body.facilities) {
-      updateData.facilities = req.body.facilities;
+    if (req.body.facilities && Array.isArray(req.body.facilities)) {
+      updateData.facilities = req.body.facilities.filter((f) => f && f !== "");
+    } else if (req.body.facilities) {
+      updateData.facilities = [req.body.facilities].filter(
+        (f) => f && f !== ""
+      );
     }
-    if (req.body.collegeCourses) {
-      updateData.collegeCourses = req.body.collegeCourses;
+
+    if (req.body.collegeCourses && Array.isArray(req.body.collegeCourses)) {
+      updateData.collegeCourses = req.body.collegeCourses.filter(
+        (c) => c && c !== ""
+      );
+    } else if (req.body.collegeCourses) {
+      updateData.collegeCourses = [req.body.collegeCourses].filter(
+        (c) => c && c !== ""
+      );
     }
-    if (req.body.approvedThrough) {
-      updateData.approvedThrough = req.body.approvedThrough;
+
+    if (req.body.approvedThrough && Array.isArray(req.body.approvedThrough)) {
+      updateData.approvedThrough = req.body.approvedThrough.filter(
+        (a) => a && a !== ""
+      );
+    } else if (req.body.approvedThrough) {
+      updateData.approvedThrough = [req.body.approvedThrough].filter(
+        (a) => a && a !== ""
+      );
     }
 
     const updated = await College.findByIdAndUpdate(id, updateData, {
