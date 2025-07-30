@@ -4,11 +4,6 @@ const StateSchema = new mongoose.Schema(
   {
     name: { type: String, required: true }, // State Name
     code: { type: String, required: true }, // State Code (short/abbreviation)
-    country: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Country",
-      required: true,
-    },
     description: { type: String, required: true },
     logo: { type: String },
     flag: { type: String },

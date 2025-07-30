@@ -4,6 +4,23 @@ import cors from "cors";
 import multer from "multer";
 import path from "path";
 import { connectDB } from "./db.js";
+
+// Import all models to ensure they are registered
+import "./models/affliciation.model.js";
+import "./models/approvesThrough.model.js";
+import "./models/College.model.js";
+import "./models/collegeFacility.model.js";
+import "./models/course.model.js";
+import "./models/degree.model.js";
+import "./models/district.model.js";
+import "./models/Exam.model.js";
+import "./models/ExamLevel.model.js";
+import "./models/examType.model.js";
+import "./models/ownership.model.js";
+import "./models/ranking.model.js";
+import "./models/state.model.js";
+import "./models/stream.model.js";
+
 import countryRoutes from "./Route/country.routes.js";
 import commonRoutes from "./Route/common.routes.js";
 import streamRoutes from "./Route/stream.route.js";

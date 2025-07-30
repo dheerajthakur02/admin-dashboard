@@ -41,15 +41,23 @@ export const addExam = async (req, res) => {
     await exam.save();
     res.status(201).json({ message: "Exam added successfully!", exam });
   } catch (error) {
+    console.error("Error adding exam:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
 export const getAllExams = async (req, res) => {
   try {
-    const exams = await Exam.find().sort({ createdAt: -1 });
+    const exams = await Exam.find()
+      .populate("stream", "name")
+      .populate("course", "name")
+      .populate("examLevel", "name")
+      .populate("examType", "examTypeName")
+      .populate("state", "name")
+      .sort({ createdAt: -1 });
     res.status(200).json(exams);
   } catch (error) {
+    console.error("Error getting exams:", error);
     res.status(500).json({ message: "Failed to fetch exams" });
   }
 };

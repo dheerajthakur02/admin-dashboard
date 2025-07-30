@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const DistrictSchema = new mongoose.Schema(
   {
-    country: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Country",
-      required: true,
-    },
     state: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "State",

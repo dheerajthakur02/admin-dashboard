@@ -64,19 +64,13 @@ sidebarOverlay?.addEventListener("click", closeSidebar);
 async function countForDashboard() {
   try {
     const data = await apiRequest("http://localhost:4000/api/get-counts");
-    document.getElementById("countryCountForDashboard").textContent =
-      data.data?.countryCount ?? "-";
     document.getElementById("StateCountForDashboard").textContent =
       data.data?.stateCount ?? "-";
     document.getElementById("districtCountForDashboard").textContent =
       data.data?.districtCount ?? "-";
   } catch (err) {
     console.error("Dashboard count fetch failed:", err);
-    [
-      "countryCountForDashboard",
-      "StateCountForDashboard",
-      "districtCountForDashboard",
-    ].forEach((id) => {
+    ["StateCountForDashboard", "districtCountForDashboard"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.textContent = "-";
     });

@@ -20,6 +20,7 @@ export const getAllExamLevels = async (req, res) => {
     const levels = await ExamLevel.find().sort({ createdAt: 1 });
     res.status(200).json(levels);
   } catch (error) {
+    console.error("Error getting exam levels:", error);
     res.status(500).json({ message: "Failed to fetch exam levels" });
   }
 };

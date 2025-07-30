@@ -41,6 +41,7 @@ export const getAllCourses = async (req, res) => {
     const courses = await Course.find().populate("stream").populate("degree");
     res.json({ courses });
   } catch (error) {
+    console.error("Error getting courses:", error);
     res
       .status(500)
       .json({ message: "Failed to fetch courses", error: error.message });

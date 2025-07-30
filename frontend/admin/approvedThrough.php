@@ -13,10 +13,10 @@
   <?php include '../components/sidebar.php'; ?>
   <div class="main page-transition">
     <?php
-        $pageTitle = 'Approved Through';
-        $breadcrumb = ['Home', 'Master Data', 'Approved Through'];
-        include '../components/breadcum.php';
-      ?>
+    $pageTitle = 'Approved Through';
+    $breadcrumb = ['Home', 'Master Data', 'Approved Through'];
+    include '../components/breadcum.php';
+    ?>
     <div class="main-container">
       <div class="degree-container">
         <form class="degree-form">

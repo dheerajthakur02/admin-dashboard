@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
+    <title>Admin Panel Of BAMS in Karnataka</title>
     <link href="../style.css" rel="stylesheet" />
     <link
       rel="stylesheet"
@@ -16,15 +16,7 @@
     <div class="main page-transition">
       <?php include '../components/page-header.php'; ?>
       <div class="dashboard-cards">
-        <a href="country.php" style="text-decoration: none">
-          <div class="card card-blue">
-            <div class="card-title" style="color: inherit">Country</div>
-            <div class="card-value" id='countryCountForDashboard'>0</div>
-            <span class="more-info"
-              >More info <i class="fa fa-arrow-circle-right"></i
-            ></span>
-          </div>
-        </a>
+        <!-- Country card removed as per user request -->
         <div class="card card-orange">
           <div class="card-title">State</div>
           <div class="card-value" id="StateCountForDashboard"></div>

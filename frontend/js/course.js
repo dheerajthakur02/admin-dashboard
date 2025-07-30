@@ -160,6 +160,9 @@ window.addEventListener("DOMContentLoaded", function () {
       courseFormDiv.style.display = "block";
       courseListDiv.style.display = "none";
       courseForm.reset();
+      // Hide Add Record button, show Record List button
+      showCourseFormBtn.style.display = "none";
+      showRecordListBtn.style.display = "inline-block";
       // Populate dropdowns
       populateDropdown(
         "http://localhost:4000/api/stream/all",
@@ -181,6 +184,9 @@ window.addEventListener("DOMContentLoaded", function () {
     showRecordListBtn.addEventListener("click", async function () {
       courseFormDiv.style.display = "none";
       courseListDiv.style.display = "block";
+      // Hide Record List button, show Add Record button
+      showRecordListBtn.style.display = "none";
+      showCourseFormBtn.style.display = "inline-block";
       await fetchAndDisplayCourses();
     });
   }

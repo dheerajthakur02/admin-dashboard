@@ -1,18 +1,16 @@
 import State from "../models/state.model.js";
-import Country from "../models/Country.model.js";
 
 export const addState = async (req, res) => {
   try {
-    const { country, name, code, description } = req.body;
+    const { name, code, description } = req.body;
     const logoFile = req.files?.logo?.[0];
     const flagFile = req.files?.flag?.[0];
 
-    if (!country || !name || !code || !description) {
+    if (!name || !code || !description) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
     const state = new State({
-      country,
       name,
       code,
       description,
@@ -29,19 +27,24 @@ export const addState = async (req, res) => {
 
 export const getAllStates = async (req, res) => {
   try {
-    const states = await State.find().populate("country", "_id name");
+    console.log("Fetching all states...");
+    const states = await State.find();
+    console.log(`Found ${states.length} states`);
     res.status(200).json(states);
   } catch (error) {
     console.error("Fetch error:", error.message);
-    res.status(500).json({ message: "Failed to fetch states" });
+    res.status(500).json({ 
+      message: "Failed to fetch states",
+      error: error.message 
+    });
   }
 };
 
 export const editState = async (req, res) => {
   try {
     const { id } = req.params;
-    const { country, name, code, description } = req.body;
-    let updateData = { country, name, code, description };
+    const { name, code, description } = req.body;
+    let updateData = { name, code, description };
     if (req.files?.logo?.[0]) {
       updateData.logo = `uploads/${req.files.logo[0].filename}`;
     }

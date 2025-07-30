@@ -6,14 +6,12 @@ $sidebarMenu = [
     'icon' => 'fa-th-large',
     'href' => 'dashboard.php',
     'pages' => ['dashboard'],
-    'badge' => 'New',
   ],
   [
     'label' => 'Location Directory',
     'icon' => 'fa-database',
-    'pages' => ['country', 'state', 'district'],
+    'pages' => ['state', 'district'],
     'children' => [
-      ['label' => 'Country', 'href' => 'country.php'],
       ['label' => 'State', 'href' => 'state.php'],
       ['label' => 'District', 'href' => 'district.php'],
     ],
@@ -92,7 +90,7 @@ $currentPage = str_replace('/', '', str_replace('.php', '', str_replace('.html',
 <div class="sidebar">
   <div class="logo">
     <img src="https://img.icons8.com/color/48/000000/school-building.png" alt="Logo" />
-    Admin Panel
+    <h2><b>BAMS KARNATAKA</b></h2>
   </div>
   <nav>
     <ul class="menu-list">

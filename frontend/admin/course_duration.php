@@ -14,10 +14,10 @@
   <?php include '../components/sidebar.php'; ?>
   <div class="main page-transition">
     <?php
-        $pageTitle = 'Duration Type';
-        $breadcrumb = ['Home', 'Master Data', 'Course Duration'];
-        include '../components/breadcum.php';
-      ?>
+    $pageTitle = 'Duration Type';
+    $breadcrumb = ['Home', 'Master Data', 'Course Duration'];
+    include '../components/breadcum.php';
+    ?>
     <div class="main-container">
       <div class="degree-container">
         <form class="degree-form">

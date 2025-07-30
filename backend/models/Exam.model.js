@@ -2,8 +2,15 @@ import mongoose from "mongoose";
 
 const ExamSchema = new mongoose.Schema(
   {
-    stream: { type: String, required: true },
-    course: { type: String },
+    stream: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Stream",
+      required: true,
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
     examName: { type: String, required: true },
     title: { type: String },
     displayRank: { type: Number, default: 0 },
@@ -13,9 +20,20 @@ const ExamSchema = new mongoose.Schema(
     applicationDate: { type: Date },
     examDate: { type: Date },
     resultDate: { type: Date },
-    examLevel: { type: String, required: true },
-    examType: { type: String },
-    state: { type: String, required: true },
+    examLevel: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExamLevel",
+      required: true,
+    },
+    examType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExamType",
+    },
+    state: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "State",
+      required: true,
+    },
     logo: { type: String },
     pdf: { type: String },
   },

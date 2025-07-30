@@ -13,10 +13,10 @@
   <?php include '../components/sidebar.php'; ?>
   <div class="main page-transition">
     <?php
-        $pageTitle = 'College Facility';
-        $breadcrumb = ['Home', 'Master Data', 'College Facility'];
-        include '../components/breadcum.php';
-      ?>
+    $pageTitle = 'College Facility';
+    $breadcrumb = ['Home', 'Master Data', 'College Facility'];
+    include '../components/breadcum.php';
+    ?>
     <div class="main-container">
       <div class="degree-container">
         <form class="degree-form" enctype="multipart/form-data">
@@ -46,5 +46,6 @@
   </div>
  <script src="../js/collegeFacility.js"></script>
  <script src="../js/common.js"></script>
+ <script src="../js/pagination.js"></script>
 </body>
 </html> 

@@ -14,10 +14,10 @@
   <?php include '../components/sidebar.php'; ?>
   <div class="main page-transition">
     <?php
-        $pageTitle = 'Course Type';
-        $breadcrumb = ['Home', 'Master Data', 'Course'];
-        include '../components/breadcum.php';
-      ?>
+    $pageTitle = 'Course Type';
+    $breadcrumb = ['Home', 'Master Data', 'Course'];
+    include '../components/breadcum.php';
+    ?>
     <div class="main-container course-container">
       <div class="top-actions">
         <button id="showCourseFormBtn" class="action-btn"><i class="fa fa-plus"></i> Add Record</button>

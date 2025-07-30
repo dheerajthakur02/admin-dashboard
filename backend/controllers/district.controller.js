@@ -1,14 +1,13 @@
 import District from "../models/district.model.js";
-import Country from "../models/Country.model.js";
 import State from "../models/state.model.js";
 
 export const addDistrict = async (req, res) => {
   try {
-    const { country, state, districtName } = req.body;
-    if (!country || !state || !districtName) {
+    const { state, districtName } = req.body;
+    if (!state || !districtName) {
       return res.status(400).json({ message: "All fields are required." });
     }
-    const district = new District({ country, state, districtName });
+    const district = new District({ state, districtName });
     await district.save();
     res.status(201).json({ message: "District added successfully!", district });
   } catch (error) {
@@ -19,9 +18,7 @@ export const addDistrict = async (req, res) => {
 
 export const getAllDistricts = async (req, res) => {
   try {
-    const districts = await District.find()
-      .populate("country", "name")
-      .populate("state", "name");
+    const districts = await District.find().populate("state", "name");
     res.status(200).json(districts);
   } catch (error) {
     console.error("Fetch error:", error.message);
@@ -29,11 +26,27 @@ export const getAllDistricts = async (req, res) => {
   }
 };
 
+export const getDistrictsByState = async (req, res) => {
+  try {
+    const { stateId } = req.params;
+    console.log("Fetching districts for state:", stateId);
+    const districts = await District.find({ state: stateId }).populate(
+      "state",
+      "name"
+    );
+    console.log("Found districts:", districts.length);
+    res.status(200).json(districts);
+  } catch (error) {
+    console.error("Fetch error:", error.message);
+    res.status(500).json({ message: "Failed to fetch districts by state" });
+  }
+};
+
 export const editDistrict = async (req, res) => {
   try {
     const { id } = req.params;
-    const { country, state, districtName } = req.body;
-    let updateData = { country, state, districtName };
+    const { state, districtName } = req.body;
+    let updateData = { state, districtName };
     const updated = await District.findByIdAndUpdate(id, updateData, {
       new: true,
     });

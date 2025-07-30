@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let editMode = false;
   let editId = null;
 
-  // Button event listeners
+  // Button event listeners with toggle functionality
   if (showFormBtn) {
     showFormBtn.onclick = () => {
       editMode = false;
@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
       countryForm.reset();
       formDiv.style.display = "";
       listDiv.style.display = "none";
+      // Hide Add Record button, show Record List button
+      showFormBtn.style.display = "none";
+      showListBtn.style.display = "inline-block";
       // Focus the Country Name input
       const nameInput = countryForm.querySelector('input[name="name"]');
       if (nameInput) {
@@ -41,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
       countryForm.reset();
       formDiv.style.display = "none";
       listDiv.style.display = "";
+      // Hide Record List button, show Add Record button
+      showListBtn.style.display = "none";
+      showFormBtn.style.display = "inline-block";
       fetchCountries();
     };
   }

@@ -16,6 +16,7 @@ export const getAllExamType = async (req, res) => {
     const examType = await ExamType.find();
     res.status(200).json(examType);
   } catch (error) {
+    console.error("Error getting exam types:", error);
     res.status(500).json({ message: error.message });
   }
 };

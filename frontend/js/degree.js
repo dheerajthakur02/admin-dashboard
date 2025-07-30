@@ -1,138 +1,221 @@
-// Wait for DOM to load
-window.addEventListener("DOMContentLoaded", function () {
-  const form = document.querySelector(".degree-form");
-  const input = document.querySelector(".degree-input");
-  const tableBody = document.querySelector(".degree-table tbody");
-  const submitBtn = document.getElementById("degreeSubmit");
-  const updateBtn = document.getElementById("degreeUpdate");
-  const backBtn = document.getElementById("degreeBack");
-  let degreeCount = 0;
-  let editingDegreeId = null;
+document.addEventListener("DOMContentLoaded", function () {
+  const baseUrl = window.baseUrl || "http://localhost:4000/api";
+  if (typeof initSidebar === "function") initSidebar();
 
-  // Fetch and display all degrees on page load
-  async function loadDegrees() {
-    try {
-      const response = await fetch("http://localhost:4000/api/degree/all");
-      if (!response.ok) throw new Error("Failed to fetch degrees");
-      const degrees = await response.json();
+  const degreeForm = document.getElementById("degreeForm");
+  const formDiv = document.getElementById("formDiv");
+  const listDiv = document.getElementById("listDiv");
+  const degreeTable = document.getElementById("degreeTable");
+  let allDegrees = [];
+  let pagination = null; // Added for pagination
 
-      tableBody.innerHTML = "";
-      degreeCount = 0;
-      degrees.degrees.forEach((degree) => {
-        degreeCount++;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-                    <td>${degreeCount}</td>
-                    <td>${degree.name}</td>
-                    <td>
-                      <button class="edit-btn" data-id="${degree._id}" data-name="${degree.name}">✏️</button>
-                      <button class="delete-btn" data-id="${degree._id}">🗑️</button>
-                    </td>
-                `;
-        tableBody.appendChild(tr);
-      });
-      // Add event listeners for edit and delete buttons
-      tableBody.querySelectorAll(".edit-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          const id = this.getAttribute("data-id");
-          const name = this.getAttribute("data-name");
-          editingDegreeId = id;
-          input.value = name;
-          submitBtn.style.display = "none";
-          updateBtn.style.display = "inline-block";
-          backBtn.style.display = "inline-block";
-        });
-      });
-      tableBody.querySelectorAll(".delete-btn").forEach((btn) => {
-        btn.addEventListener("click", async function () {
-          const id = this.getAttribute("data-id");
-          await deleteDegree(id);
-          await loadDegrees();
-        });
-      });
-    } catch (err) {
-      tableBody.innerHTML =
-        '<tr><td colspan="3">Error loading degrees</td></tr>';
+  // Custom render function for degrees (for pagination)
+  function renderDegreeTable(data, startIndex) {
+    if (!degreeTable) return;
+
+    degreeTable.innerHTML = data
+      .map(
+        (d, i) => `
+      <tr>
+        <td>${startIndex + i + 1}</td>
+        <td>${d.name || ""}</td>
+        <td class="action-buttons">
+          <button class="edit-state-btn" data-id="${
+            d._id
+          }"><i class="fa fa-edit"></i></button>
+          <button class="delete-state-btn" data-id="${
+            d._id
+          }"><i class="fa fa-trash"></i></button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Add event listeners for edit and delete buttons
+    addEventListeners();
+  }
+
+  // Add event listeners for edit and delete buttons (separate function)
+  function addEventListeners() {
+    // Use event delegation for better reliability
+    if (degreeTable) {
+      // Remove existing listener to prevent duplicates
+      degreeTable.removeEventListener("click", handleTableClick);
+      degreeTable.addEventListener("click", handleTableClick);
     }
   }
 
-  loadDegrees();
+  // Event handler function using event delegation
+  function handleTableClick(event) {
+    const target = event.target;
 
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    if (editingDegreeId) return; // Prevent submit if editing
-    const name = input.value.trim();
-    if (!name) return;
+    // Handle edit button clicks
+    if (target.closest(".edit-state-btn")) {
+      const btn = target.closest(".edit-state-btn");
+      const id = btn.getAttribute("data-id");
+      const degree = allDegrees.find((d) => d._id === id);
+      if (degree) openEditDegreeModal(degree);
+    }
 
-    // Send POST request to API
+    // Handle delete button clicks
+    if (target.closest(".delete-state-btn")) {
+      const btn = target.closest(".delete-state-btn");
+      const id = btn.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this degree?")) {
+        deleteDegree(id);
+      }
+    }
+  }
+
+  // Fetch all degrees
+  async function fetchDegrees() {
     try {
-      const response = await fetch("http://localhost:4000/api/degree/add", {
+      const response = await fetch(`${baseUrl}/degree/all`);
+      if (!response.ok) throw new Error("Failed to fetch degrees");
+      const data = await response.json();
+      allDegrees = data.degrees || [];
+      initPaginationForDegrees(); // Changed from renderDegreeTable(allDegrees)
+    } catch (err) {
+      degreeTable.innerHTML =
+        '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Failed to load data</td></tr>';
+    }
+  }
+
+  // Initialize pagination for degrees
+  function initPaginationForDegrees() {
+    // Create pagination container if it doesn't exist
+    let paginationContainer = document.getElementById("pagination-container");
+    if (!paginationContainer) {
+      paginationContainer = document.createElement("div");
+      paginationContainer.id = "pagination-container";
+      paginationContainer.className = "pagination-wrapper";
+      // Insert after the table container
+      const tableContainer = degreeTable.closest(".table-container");
+      if (tableContainer) {
+        tableContainer.parentNode.insertBefore(
+          paginationContainer,
+          tableContainer.nextSibling
+        );
+      } else {
+        degreeTable.parentNode.appendChild(paginationContainer);
+      }
+    }
+
+    // Initialize pagination
+    pagination = initPagination({
+      container: degreeTable,
+      data: allDegrees,
+      itemsPerPage: 10,
+      renderFunction: renderDegreeTable,
+      onPageChange: (currentData, currentPage) => {
+        // Re-add event listeners after page change
+        setTimeout(() => {
+          addEventListeners();
+        }, 50);
+      },
+    });
+  }
+
+  // Show/hide form and list with button toggle
+  const showFormBtn = document.getElementById("showFormBtn");
+  const showListBtn = document.getElementById("showListBtn");
+  if (showFormBtn && showListBtn && formDiv && listDiv) {
+    showFormBtn.addEventListener("click", function () {
+      formDiv.style.display = "block";
+      listDiv.style.display = "none";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+    showListBtn.addEventListener("click", function () {
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+    });
+  }
+
+  // Add degree using common form handler
+  handleForm(degreeForm, async (formData) => {
+    try {
+      const name = formData.get("name");
+      await fetch(`${baseUrl}/degree/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name }),
       });
-      if (!response.ok) throw new Error("Failed to add degree");
-      const data = await response.json();
-
-      // Reload the list to keep numbering and data in sync
-      await loadDegrees();
-      input.value = "";
-    } catch (err) {
-      alert("Error: " + err.message);
+      alert("Degree added!");
+      degreeForm.reset();
+      formDiv.style.display = "none";
+      listDiv.style.display = "block";
+      // Show both buttons
+      showFormBtn.style.display = "inline-block";
+      showListBtn.style.display = "inline-block";
+      fetchDegrees();
+    } catch (error) {
+      alert("Failed to submit degree.");
     }
   });
 
-  updateBtn.addEventListener("click", async function () {
-    const name = input.value.trim();
-    if (!editingDegreeId || !name) return;
-    await updateDegree(editingDegreeId, name);
-    await loadDegrees();
-    resetForm();
-  });
-
-  backBtn.addEventListener("click", function () {
-    resetForm();
-    loadDegrees();
-  });
-
-  function resetForm() {
-    editingDegreeId = null;
-    input.value = "";
-    submitBtn.style.display = "inline-block";
-    updateBtn.style.display = "none";
-    backBtn.style.display = "none";
-  }
-});
-
-// Add these helper functions at the end of the DOMContentLoaded event listener
-async function updateDegree(id, name) {
-  try {
-    const response = await fetch(
-      `http://localhost:4000/api/degree/update?_id=${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      }
-    );
-    if (!response.ok) throw new Error("Failed to update degree");
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-async function deleteDegree(id) {
-  try {
-    const response = await fetch(
-      `http://localhost:4000/api/degree/delete?_id=${id}`,
-      {
+  // Delete degree using common API utility
+  async function deleteDegree(id) {
+    try {
+      await fetch(`${baseUrl}/degree/delete?_id=${id}`, {
         method: "DELETE",
-      }
-    );
-    if (!response.ok) throw new Error("Failed to delete degree");
-  } catch (err) {
-    alert("Error: " + err.message);
+      });
+      alert("Degree deleted!");
+      fetchDegrees();
+    } catch (error) {
+      alert("Failed to delete degree.");
+    }
   }
-}
+
+  // Edit modal logic
+  const editDegreeModal = document.getElementById("editDegreeModal");
+  const closeEditDegreeModalBtn = document.getElementById(
+    "closeEditDegreeModal"
+  );
+  const cancelEditDegreeBtn = document.getElementById("cancelEditDegreeBtn");
+  function openEditDegreeModal(degree) {
+    document.getElementById("editDegreeId").value = degree._id;
+    document.getElementById("editDegreeName").value = degree.name;
+    if (editDegreeModal) editDegreeModal.style.display = "flex";
+  }
+  function closeEditDegreeModal() {
+    if (editDegreeModal) editDegreeModal.style.display = "none";
+  }
+  if (closeEditDegreeModalBtn)
+    closeEditDegreeModalBtn.onclick = closeEditDegreeModal;
+  if (cancelEditDegreeBtn) cancelEditDegreeBtn.onclick = closeEditDegreeModal;
+  window.onclick = function (event) {
+    if (event.target === editDegreeModal) closeEditDegreeModal();
+  };
+
+  // Edit form submit using common form handler
+  const editDegreeForm = document.getElementById("editDegreeForm");
+  handleForm(editDegreeForm, async (formData) => {
+    const id = document.getElementById("editDegreeId").value;
+    try {
+      const name = formData.get("name");
+      await fetch(`${baseUrl}/degree/update?_id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      alert("Degree updated!");
+      closeEditDegreeModal();
+      fetchDegrees();
+    } catch (error) {
+      alert("Failed to update degree.");
+    }
+  });
+
+  // Initial population
+  fetchDegrees();
+});

@@ -4,7 +4,11 @@
 async function apiRequest(url, options = {}) {
   try {
     const res = await fetch(url, options);
-    if (!res.ok) throw new Error(res.statusText);
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`API Error ${res.status}:`, errorText);
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
     return await res.json();
   } catch (err) {
     console.error("API error:", err);
